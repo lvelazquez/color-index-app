@@ -1,0 +1,15 @@
+{
+  "name": "colorindex",
+  "version": "1.0.0",
+  "description": "Color Index",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsc --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.0.5"
+  }
+}
