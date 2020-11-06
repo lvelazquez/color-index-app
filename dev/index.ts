@@ -27,32 +27,55 @@
             super();            
         } 
 
-        copyColors() {
-            
+        copyColors(target) {                                                            
+            const currentTarget = (target.target as HTMLElement);
+               let copyColorList: string = "";
+               switch(currentTarget.dataset.type) {
+                   case "hex": 
+                        copyColorList = `[${this.colorItems[currentTarget.dataset.key]}]`;                            
+                        break;
+               case "rgb":
+                       const rgbList = this.colorItems[currentTarget.dataset.key].split(",").map(hex=> {                                
+                       const rgbValues = this.convertToRGB(hex.trim());                                
+                            return `(${rgbValues})`;
+                       });
+                       copyColorList = `[${rgbList.join(",")}]`;
+                       break; 
+            }
+            if(copyColorList.length > 1) {
+                var data = [new ClipboardItem({ "text/plain": new Blob([copyColorList], { type: "text/plain" }) })];
+                navigator.clipboard.write(data).then(function() {
+                    console.log("Copied to clipboard successfully!");
+                    }, function() {
+                    console.error("Unable to write to clipboard. :-(");
+                    });
+            }        
         }
 
         disconnectedCallback() {
-
+            this.removeEventListener("click", this.copyColors);
         }
 
         getCopyButtons(id: string): HTMLElement {
+
             const copyButtonsContainer = document.createElement("div");
             const copyHex = document.createElement("button");
             copyHex.innerText = "Copy HEX";
             copyHex.setAttribute("data-type", "hex");
             copyHex.setAttribute("data-key", id);
             copyButtonsContainer.appendChild(copyHex);
+
             const copyRGB = document.createElement("button");
             copyRGB.setAttribute("data-type", "rgb");
             copyRGB.innerText = "Copy RGB";
             copyRGB.setAttribute("data-key", id);
             copyButtonsContainer.appendChild(copyRGB);
+
             return copyButtonsContainer;
         }
 
         convertToRGB(hex: string) {
             var aRgbHex = hex.match(/\w{1,2}/g);
-            console.log(hex, "aRgbHex", aRgbHex)
             var aRgb = [
                 parseInt(aRgbHex[0], 16),
                 parseInt(aRgbHex[1], 16),
@@ -93,33 +116,7 @@
                     this.appendChild(colorItemContainer);
                 }  
     
-                this.addEventListener("click", (target)=> {
-                                                            
-                    const currentTarget = (target.target as HTMLElement);
-                    let copyColorList: string = "";
-                    switch(currentTarget.dataset.type) {
-                        case "hex": 
-                            copyColorList = `[${this.colorItems[currentTarget.dataset.key]}]`;                            
-                            break;
-                    case "rgb":
-                            const rgbList = this.colorItems[currentTarget.dataset.key].split(",").map(hex=> {                                
-                                const rgbValues = this.convertToRGB(hex.trim());                                
-                                return `(${rgbValues})`;
-                            });
-                            copyColorList = `[${rgbList.join(",")}]`;
-                            break; 
-                    }
-                if(copyColorList.length > 1) {
-                    console.log("copyColorList", copyColorList);
-                    var data = [new ClipboardItem({ "text/plain": new Blob([copyColorList], { type: "text/plain" }) })];
-                    navigator.clipboard.write(data).then(function() {
-                        console.log("Copied to clipboard successfully!");
-                        }, function() {
-                        console.error("Unable to write to clipboard. :-(");
-                        });
-                }
-                    
-                })
+                this.addEventListener("click", this.copyColors)
             }
             
         }
@@ -132,14 +129,13 @@
     /**
      * Save button and indicates that there's data in localStorage that hasn't been saved
      */
-    customElements.define('color-save-btn',  class ColorSaveBtn extends HTMLDivElement {
+    customElements.define('palette-input',  class PaletteInput extends HTMLDivElement {
         constructor() {
             super();
-        }        
-    }, { extends: "button" });
+        }
+        connen
+    }, { extends: "div" });
 
-    class PaletteInput {
-
-    }
+    
 
 })();
