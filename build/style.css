@@ -1,0 +1,16 @@
+.color-index-app {
+  display: grid;
+  font-family: Helvetica;
+}
+.color-item-container {
+  display: flex;
+}
+.color-item-list {
+  display: flex;
+  height: 100px;
+  flex-direction: row;
+}
+.color-item-list > div {
+  display: "inline-block";
+  flex: 1;
+}
