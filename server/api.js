@@ -4,7 +4,7 @@ const Airtable = require('airtable')
 require('dotenv').config()
 
 const base = new Airtable({ apiKey: process.env.AIRTABLESECRETKEY || '' }).base(
-  'appRroYp8W79za5MC'
+  process.env.AIRTABLEBASEKEY
 )
 
 // The root provides a resolver function for each API endpoint
@@ -16,22 +16,18 @@ module.exports = {
           view: 'Grid view'
         })
         .eachPage(
-          async function page (records, fetchNextPage) {
+          async function page (records, fetchNextPage) {            
             // This function (`page`) will get called for each page of records.
-            const data = records.map(record => {
+            const data = records.map((record, i) => {
               return {
                 name: record.get('Name'),
-                id: record.id,
-                colors: record.get("colors")
+                id: `colors${i}`,
+                colors: record.get("Colors")
               }
-            }).reduce((o)=> o[o.id], {});
-
+            }).reduce((acc, o)=> {            
+              return Object.assign({ [o.name]: o.colors }, acc);
+          }, {});
             resolve(data)
-
-            // To fetch the next page of records, call `fetchNextPage`.
-            // If there are more records, `page` will get called again.
-            // If there are no more records, `done` will get called.
-            fetchNextPage()
           },
           function done (err) {
             if (err) {
