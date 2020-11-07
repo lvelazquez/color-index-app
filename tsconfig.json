@@ -67,8 +67,8 @@
     /* Advanced Options */
     "skipLibCheck": true,                     /* Skip type checking of declaration files. */
     "forceConsistentCasingInFileNames": true, /* Disallow inconsistently-cased references to the same file. */
-    "typeRoots": [ "types/clipboard.d.ts", "./node_modules/@types"],    
-    // "types": ["ClipboardItem"]  
+    "typeRoots": [ "./types/", "./node_modules/@types"],    
+    "types": ["ClipboardItem"]  
   },
   "include": ["./dev"],
   "exclude": ["./build", "./node_modules/*", "./server", "./types/"],

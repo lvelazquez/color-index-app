@@ -7,6 +7,12 @@
  * Send palettes to color-index-list
  *  
  **/ 
+// !! in any place or file !!
+// Type declarations for Clipboard API
+// https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API
+
+
+
 (function() {
     "use strict";
     interface ColorItems {

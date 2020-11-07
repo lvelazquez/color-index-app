@@ -1,20 +1,37 @@
-// interface ClipboardItem {
-//   new (input: { [contentType: string]: Blob }): ClipboardItem;
-// }
+interface ClipboardItem {
+  new (input: { [contentType: string]: Blob }): ClipboardItem;
+}
 
-// interface NavigatorClipboard {
-//   // Only available in a secure context.
-//   readonly clipboard?: Clipboard;
-// }
+type AsyncClipboardWriteFunction = (input: ClipboardItem) => Promise<void>;
 
-// interface Navigator extends NavigatorClipboard {}
+declare global {
+  interface Window {
+    ClipboardItem: ClipboardItem | undefined;
+  }
 
-// type AsyncClipboardWriteFunction = (input: ClipboardItem) => Promise<void>;
+  interface Clipboard {
+    write?: AsyncClipboardWriteFunction;
+  }
+}
 
-// interface Navigator {
-//   clipboard: AsyncClipboard;
-//   ClipboardItem: ClipboardItem;
-// }
+interface AsyncClipboard extends Clipboard {
+  write: AsyncClipboardWriteFunction;
+}
+
+
+interface NavigatorClipboard {
+  // Only available in a secure context.
+  readonly clipboard?: Clipboard;
+}
+
+interface Navigator extends NavigatorClipboard {}
+
+type AsyncClipboardWriteFunction = (input: ClipboardItem) => Promise<void>;
+
+interface Navigator {
+  clipboard: AsyncClipboard;
+  ClipboardItem: ClipboardItem;
+}
 
 // declare global {
 //   interface Window {
