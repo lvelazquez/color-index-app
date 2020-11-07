@@ -15,6 +15,8 @@
     interface ColorIndexResponse extends Response {
         statusCode: number;
     }
+    
+
     /**
      * ColorIndexList
      * shows current list of color palettes
@@ -27,29 +29,33 @@
             super();            
         } 
 
-        copyColors(target) {                                                            
-            const currentTarget = (target.target as HTMLElement);
-               let copyColorList: string = "";
-               switch(currentTarget.dataset.type) {
-                   case "hex": 
-                        copyColorList = `[${this.colorItems[currentTarget.dataset.key]}]`;                            
-                        break;
-               case "rgb":
-                       const rgbList = this.colorItems[currentTarget.dataset.key].split(",").map(hex=> {                                
-                       const rgbValues = this.convertToRGB(hex.trim());                                
-                            return `(${rgbValues})`;
-                       });
-                       copyColorList = `[${rgbList.join(",")}]`;
-                       break; 
+        copyColors(e: MouseEvent) {                                                            
+            const currentTarget = (e.target as HTMLElement);
+            if(currentTarget !== undefined ) {
+                let copyColorList: string = "";
+                switch(currentTarget.dataset.type) {
+                    case "hex": 
+                         copyColorList = `[${this.colorItems[currentTarget.dataset.key!]}]`;                            
+                         break;
+                case "rgb":
+                        const rgbList = this.colorItems[currentTarget.dataset.key!].split(",").map((hex)=> {                                
+                        const rgbValues = this.convertToRGB(hex.trim());                                
+                             return !rgbValues ? false : `(${rgbValues})`;
+                        });
+                        copyColorList = `[${rgbList.join(",")}]`;
+                        break; 
+             }
+             if(copyColorList.length > 1) {
+                 const data = [new ClipboardItem({ "text/plain": new Blob([copyColorList], { type: "text/plain" }) })];
+                 const anyNavigator: any = window.navigator;
+                 anyNavigator.clipboard!.write(data).then(function() {
+                     console.log("Copied to clipboard successfully!");
+                     }, function() {
+                     console.error("Unable to write to clipboard. :-(");
+                     });
+             }        
             }
-            if(copyColorList.length > 1) {
-                var data = [new ClipboardItem({ "text/plain": new Blob([copyColorList], { type: "text/plain" }) })];
-                navigator.clipboard.write(data).then(function() {
-                    console.log("Copied to clipboard successfully!");
-                    }, function() {
-                    console.error("Unable to write to clipboard. :-(");
-                    });
-            }        
+               
         }
 
         disconnectedCallback() {
@@ -74,14 +80,18 @@
             return copyButtonsContainer;
         }
 
-        convertToRGB(hex: string) {
-            var aRgbHex = hex.match(/\w{1,2}/g);
-            var aRgb = [
-                parseInt(aRgbHex[0], 16),
-                parseInt(aRgbHex[1], 16),
-                parseInt(aRgbHex[2], 16)
-            ];
-            return aRgb;
+        convertToRGB(hex: string): boolean | number[] {
+            var aRgbHex:string[] | null = hex.match(/\w{1,2}/g);
+            if(aRgbHex !== null && aRgbHex.length === 3) {
+                var aRgb: number[] = [
+                    parseInt(aRgbHex[0], 16),
+                    parseInt(aRgbHex[1], 16),
+                    parseInt(aRgbHex[2], 16)
+                ];
+                return aRgb;
+            }
+            
+            return false;
         }
 
         async connectedCallback() {
@@ -119,23 +129,26 @@
                 this.addEventListener("click", this.copyColors)
             }
             
-        }
-
-
-       
+        }       
 
     });
 
-    /**
-     * Save button and indicates that there's data in localStorage that hasn't been saved
-     */
     customElements.define('palette-input',  class PaletteInput extends HTMLDivElement {
         constructor() {
             super();
+            console.log("palette input ");
         }
-        connen
+        connectedCallback() {
+            
+            const input = this.ownerDocument.createElement("input");
+            const submitBtn = this.ownerDocument.createElement("button");
+            submitBtn.addEventListener("click", this.savePalette)
+            this.appendChild(submitBtn);
+            this.appendChild(input);
+        }
+        savePalette(e: MouseEvent) {
+            console.log(e);
+        }
     }, { extends: "div" });
-
     
-
 })();

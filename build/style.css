@@ -1,6 +1,7 @@
 .color-index-app {
   display: grid;
   font-family: Helvetica;
+  padding: 20px 50px;
 }
 
 .color-index-app > header {

@@ -1,7 +1,6 @@
 const process = require('process')
 const Airtable = require('airtable')
 
-require('dotenv').config()
 
 const base = new Airtable({ apiKey: process.env.AIRTABLESECRETKEY || '' }).base(
   process.env.AIRTABLEBASEKEY

@@ -11,7 +11,8 @@ app.get('/', function (req, res) {
   res.sendFile(path.resolve(__dirname, '../build/index.html'))
 })
 app.get("/colorData", async function(req, res) {
-  api.getColors().then(colors=> {
+  mockApi.getColors().then(colors=> {
+  // api.getColors().then(colors=> {
     res.json(colors);
   }).catch(err=> {
     res.json(err);
