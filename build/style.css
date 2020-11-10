@@ -1,35 +1,43 @@
-.color-index-app {
+.colorindex-app {
   display: grid;
+  grid-template-columns: 75% 25%;
+  grid-template-rows: 4vw 30vw 10vw;
+  grid-gap: 1em;
   font-family: Helvetica;
   padding: 20px 50px;
 }
 
-.color-index-app > header {
-  font-size: 2rem;
+.colorindex-header {
+  grid-column: 1 / span 2;
+  font-size: 4vw;
+  font-weight: 600;
 }
-.color-item-container {
+
+.colorindex-header,
+.colorindex-main,
+.colorindex-aside,
+.colorindex-footer {
+  justify-content: center;
+}
+
+.colorindex-item-container {
   display: block;
+  margin: 15px 0 0;
 }
-.color-item-title {
+.colorindex-item-title {
   font-size: 1rem;
   padding: 10px 0 10px;
 }
 
-.color-item-list {
+.colorindex-item-list {
   display: flex;
   height: 100px;
   flex-direction: row;
 }
 
-.color-item-list > div {
+.colorindex-item-list > div {
   display: inline-block;
   flex: 1;
-}
-
-.palette-input {
-}
-
-.save-palette-btn {
 }
 
 .hidden {

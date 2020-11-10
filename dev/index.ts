@@ -4,14 +4,9 @@
  * ColorIndexApp Init
  * 
  * Load JSON file with colors
- * Send palettes to color-index-list
+ * Send palettes to colorindex-index-list
  *  
  **/ 
-// !! in any place or file !!
-// Type declarations for Clipboard API
-// https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API
-
-
 
 (function() {
     "use strict";
@@ -20,8 +15,7 @@
     }
     interface ColorIndexResponse extends Response {
         statusCode: number;
-    }
-    
+    }    
 
     /**
      * ColorIndexList
@@ -105,19 +99,19 @@
             if(colorRes.ok) {
                 this.colorItems  = await colorRes.json();
                 this.colorKeys = Object.keys(this.colorItems);
-                this.ownerDocument.getElementById("color-index-loader").classList.add("hidden");
+                this.ownerDocument.getElementById("colorindex-loader").classList.add("hidden");
 
                 for(let colorKey of this.colorKeys) {
     
                     const colorItemContainer = document.createElement("div");
                     colorItemContainer.setAttribute("data-key", colorKey);
-                    colorItemContainer.classList.add("color-item-container");
+                    colorItemContainer.classList.add("colorindex-item-container");
     
                     const colorItemTitle = document.createElement("div");
-                    colorItemTitle.classList.add("color-item-title");
+                    colorItemTitle.classList.add("colorindex-item-title");
     
                     const colorItemListContainer = document.createElement("div");
-                    colorItemListContainer.classList.add("color-item-list");    
+                    colorItemListContainer.classList.add("colorindex-item-list");    
                     
                     colorItemContainer.appendChild(this.getCopyButtons(colorKey));
     
