@@ -13,16 +13,13 @@
     interface ColorItems {
         [id: string]: string;
     }
-    interface ColorIndexResponse extends Response {
-        statusCode: number;
-    }    
 
     /**
      * ColorIndexList
      * shows current list of color palettes
      * and lists that have been recently added from localstorage
     **/
-    customElements.define('color-index-list', class ColorIndexList extends HTMLElement {
+    customElements.define('colorindex-list', class ColorIndexList extends HTMLElement {
         private colorItems: ColorItems = {};
         private colorKeys: string[] = [];
         constructor() {
@@ -95,7 +92,7 @@
         }
 
         async connectedCallback() {
-            const colorRes: Response = await fetch("/colorData");  
+            const colorRes: Response = await fetch("/getColorData");  
             if(colorRes.ok) {
                 this.colorItems  = await colorRes.json();
                 this.colorKeys = Object.keys(this.colorItems);
@@ -133,22 +130,78 @@
 
     });
 
-    customElements.define('palette-input',  class PaletteInput extends HTMLDivElement {
+    customElements.define('colorindex-palette-input',  class PaletteInput extends HTMLElement {
+
+        private submitBtn: HTMLElement;
+        private input: HTMLElement;
+        private revealBtn: HTMLElement;
+        private addFormContainer: HTMLElement;
+        private isFormHidden = true;
+        
         constructor() {
-            super();
-            console.log("palette input ");
+            super();                                              
         }
+
         connectedCallback() {
+            this.revealBtn = this.ownerDocument.createElement("button");
+            this.revealBtn.innerText = "Add New Palette +";
+            this.revealBtn.addEventListener("click", this.togglePaletteInput);
+
+            this.addFormContainer = this.ownerDocument.createElement("div");
             
-            const input = this.ownerDocument.createElement("input");
-            const submitBtn = this.ownerDocument.createElement("button");
-            submitBtn.addEventListener("click", this.savePalette)
-            this.appendChild(submitBtn);
-            this.appendChild(input);
+            this.input = this.ownerDocument.createElement("input");
+            this.input.classList.add('colorindex-addpalette-input');
+            this.input.addEventListener("blur", this.togglePaletteInput);
+            
+            this.submitBtn = this.ownerDocument.createElement("button");
+            this.submitBtn.classList.add('colorindex-submit-btn');
+
+            this.submitBtn.addEventListener("click", this.savePalette);
+            this.submitBtn.innerText = "Save Palette";
+            
+            this.addFormContainer.appendChild(this.input);
+            this.addFormContainer.appendChild(this.submitBtn);
+
+            this.appendChild(this.addFormContainer);  
+            this.appendChild(this.revealBtn);
+
+            this.updateUI();
+        }        
+        
+        disconnectedCallback() {
+            this.submitBtn.removeEventListener("click", this.savePalette);
+            this.input.removeEventListener("blur", this.togglePaletteInput);
         }
-        savePalette(e: MouseEvent) {
-            console.log(e);
+        
+        togglePaletteInput = () => {
+            this.isFormHidden = !this.isFormHidden;
+            this.updateUI();
         }
-    }, { extends: "div" });
+
+        updateUI() {
+            if(this.isFormHidden) {
+                this.revealBtn.classList.remove("hidden");
+                this.addFormContainer.classList.add("hidden");                 
+            } else {
+                this.revealBtn.classList.add("hidden");
+                this.addFormContainer.classList.remove("hidden");
+                this.input.focus();
+            }
+        }
+
+        async savePalette(e: MouseEvent) {                  
+            // fetch color from input text field and package into object
+            const colorData = {
+                colors: '#FFFFF, #FF00F, #00FFF, #FFF00, #00FFF',
+                name: 'My Color Test',
+            };
+            const colorRes: Response = await fetch("/setColorData", {
+                    headers: { "Content-Type": "application/json; charset=utf-8" },
+                    method: 'POST',
+                    body: JSON.stringify(colorData)
+            });
+            console.log("colorRes", colorRes);
+        }
+    });
     
 })();
