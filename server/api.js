@@ -1,12 +1,10 @@
-const process = require('process')
-const Airtable = require('airtable')
-
+const process = require('process');
+const Airtable = require('airtable');
 
 const base = new Airtable({ apiKey: process.env.AIRTABLESECRETKEY || '' }).base(
   process.env.AIRTABLEBASEKEY
-)
+);
 
-// The root provides a resolver function for each API endpoint
 module.exports = {
   async getColors () {
     return new Promise(async (resolve, reject) => {
@@ -35,5 +33,56 @@ module.exports = {
           }
         )
     })
+  },
+  async setColors(colorInfo) {
+    // TODO validation
+    // TODO error handling
+    if(colorInfo.hasOwnProperty("colors") && colorInfo.hasOwnProperty("name")) {
+      return new Promise((resolve, reject)=> {
+        base("Colors").create({
+          "Colors": colorInfo.colors,
+          "Name": colorInfo.name,
+        }, (err, record) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(record.getId());
+        });
+      }    
+      );
+    }
+  },
+  async updateColors(colorInfo) {
+    // TODO improve validation
+    // TODO error handling
+    if(colorInfo.hasOwnProperty("recordId") && colorInfo.hasOwnProperty("colors") && colorInfo.hasOwnProperty("name")) {
+      return new Promise((resolve, reject)=> {
+        base("Colors").update(colorInfo.recordId, {
+          "Colors": colorInfo.colors,
+          "Name": colorInfo.name,
+        }, (err, record) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(record.getId());
+        });
+      }    
+      );
+    }
+  },
+  async removeColors(recordId) {
+    // TODO improve validation
+    // TODO error handling
+    if(colorInfo.hasOwnProperty("recordId") && colorInfo.hasOwnProperty("colors") && colorInfo.hasOwnProperty("name")) {
+      return new Promise((resolve, reject)=> {
+        base("Colors").destroy(colorInfo.recordId, (err, record) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(record.getId());
+        });
+      }    
+      );
+    }
   },
 }
