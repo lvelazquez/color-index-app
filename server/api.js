@@ -23,6 +23,9 @@ module.exports = {
                                     colors: record.get('Colors'),
                                 };
                             })
+                            .filter(
+                                (record) => typeof record.colors !== 'undefined'
+                            )
                             .reduce((acc, o) => {
                                 return Object.assign(
                                     {
