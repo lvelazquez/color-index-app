@@ -1,9 +1,8 @@
+// Type declarations for Clipboard API
+// https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API
 interface ClipboardItem {
   new (input: { [contentType: string]: Blob }): ClipboardItem;
 }
-
-type AsyncClipboardWriteFunction = (input: ClipboardItem) => Promise<void>;
-
 declare global {
   interface Window {
     ClipboardItem: ClipboardItem | undefined;
@@ -67,6 +66,6 @@ interface Navigator {
 //   };
 // };
 
-declare class ClipboardItem {
-  constructor(data: { [mimeType: string]: Blob });
-}
+// declare class ClipboardItem {
+//   constructor(data: { [mimeType: string]: Blob });
+// }

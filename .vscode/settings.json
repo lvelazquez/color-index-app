@@ -1,0 +1,8 @@
+{
+    "editor.formatOnSave": true,
+    "eslint.validate": ["typescript"],
+    // Enable per-language
+    "[javascript]": {
+        "editor.formatOnSave": true
+    }
+}
