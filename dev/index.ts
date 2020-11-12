@@ -27,12 +27,13 @@
         } 
 
         copyColors(e: MouseEvent) {                                                            
-            const currentTarget = (e.target as HTMLElement);
+            const currentTarget = (e.target as HTMLElement);            
             if(currentTarget !== undefined ) {
                 let copyColorList: string = "";
                 switch(currentTarget.dataset.type) {
                     case "hex": 
-                         copyColorList = `[${this.colorItems[currentTarget.dataset.key!]}]`;                            
+                         const hexList: string = `[${this.colorItems[currentTarget.dataset.key!]}]`.replace(/([#(\w|\d)]{7})/g, '"$1"');
+                         copyColorList = hexList;                            
                          break;
                 case "rgb":
                         const rgbList = this.colorItems[currentTarget.dataset.key!].split(",").map((hex)=> {                                
@@ -99,7 +100,7 @@
                 this.ownerDocument.getElementById("colorindex-loader").classList.add("hidden");
 
                 for(let colorKey of this.colorKeys) {
-    
+
                     const colorItemContainer = document.createElement("div");
                     colorItemContainer.setAttribute("data-key", colorKey);
                     colorItemContainer.classList.add("colorindex-item-container");
@@ -108,7 +109,7 @@
                     colorItemTitle.classList.add("colorindex-item-title");
     
                     const colorItemListContainer = document.createElement("div");
-                    colorItemListContainer.classList.add("colorindex-item-list");    
+                    colorItemListContainer.classList.add("colorindex-item-list");   
                     
                     colorItemContainer.appendChild(this.getCopyButtons(colorKey));
     
@@ -118,6 +119,7 @@
                         colorDiv.setAttribute("style", `background-color:${color}`);
                         colorItemListContainer.appendChild(colorDiv)
                     });
+
                     colorItemContainer.appendChild(colorItemTitle);
                     colorItemContainer.appendChild(colorItemListContainer);
                     this.appendChild(colorItemContainer);
