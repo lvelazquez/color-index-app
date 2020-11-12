@@ -43,3 +43,7 @@
 .hidden {
   display: none;
 }
+.colorindex-copy-log {
+  margin: 0 5px;
+  display: inline-block;
+}

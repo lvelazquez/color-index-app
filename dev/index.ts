@@ -19,41 +19,84 @@
      * shows current list of color palettes
      * and lists that have been recently added from localstorage
     **/
+
+    enum CopyState {
+        EMPTY = "EMPTY",
+        PROGRESS = "COPYING",
+        SUCCESS = "COPY_SUCCESS",
+        ERROR = "COPY_ERROR",
+    }
     customElements.define('colorindex-list', class ColorIndexList extends HTMLElement {
         private colorItems: ColorItems = {};
         private colorKeys: string[] = [];
+        private copyState: CopyState = CopyState.EMPTY;
+        private copyTimeoutId: number = 0;
         constructor() {
             super();            
         } 
 
-        copyColors(e: MouseEvent) {                                                            
+       async copyColors(e: MouseEvent) {                          
+            
             const currentTarget = (e.target as HTMLElement);            
             if(currentTarget !== undefined ) {
                 let copyColorList: string = "";
-                switch(currentTarget.dataset.type) {
+                const {type} = currentTarget.dataset;
+                const copyContainer = currentTarget.closest(".colorindex-copy-container");
+                const key = copyContainer.getAttribute("data-key");
+                const copyLog = copyContainer.querySelector("p");                
+                this.updateCopyLog(copyLog, type, CopyState.PROGRESS);                
+                switch(type) {
                     case "hex": 
-                         const hexList: string = `[${this.colorItems[currentTarget.dataset.key!]}]`.replace(/([#(\w|\d)]{7})/g, '"$1"');
+                         const hexList: string = `[${this.colorItems[key!]}]`.replace(/([#(\w|\d)]{7})/g, '"$1"');
                          copyColorList = hexList;                            
                          break;
                 case "rgb":
-                        const rgbList = this.colorItems[currentTarget.dataset.key!].split(",").map((hex)=> {                                
+                        const rgbList = this.colorItems[key!].split(",").map((hex)=> {                                
                         const rgbValues = this.convertToRGB(hex.trim());                                
                              return !rgbValues ? false : `(${rgbValues})`;
                         });
                         copyColorList = `[${rgbList.join(",")}]`;
                         break; 
              }
-             if(copyColorList.length > 1) {
-                 const data = [new ClipboardItem({ "text/plain": new Blob([copyColorList], { type: "text/plain" }) })];
-                 const anyNavigator: any = window.navigator;
-                 anyNavigator.clipboard!.write(data).then(function() {
-                     console.log("Copied to clipboard successfully!");
-                     }, function() {
-                     console.error("Unable to write to clipboard. :-(");
-                     });
-             }        
+              
+             // if(copyColorList.length > 1) {
+                const data = [new ClipboardItem({ "text/plain": new Blob([copyColorList], { type: "text/plain" }) })];
+                const anyNavigator: any = window.navigator;
+                anyNavigator.clipboard!.write(data).then(()=> {                                          
+                    this.updateCopyLog(copyLog, type, CopyState.SUCCESS);                     
+                   }, ()=> {
+                       this.updateCopyLog(copyLog, type, CopyState.ERROR);                     
+                    });
+            
+
             }
                
+        }
+
+        updateCopyLog(copyLog: HTMLElement, type: string = "", copyState: CopyState = CopyState.EMPTY) {
+            let copyStatusTxt: string = "";
+            let copyType: string = type.toUpperCase();
+            switch(copyState) {
+                case CopyState.PROGRESS:
+                    copyStatusTxt = `Copying ${copyType} Palette`
+                    break;
+                case CopyState.SUCCESS:
+                    copyStatusTxt = `Copied ${copyType} Palette Successfully!`
+                    break;
+                case CopyState.ERROR:
+                    copyStatusTxt = `Unable to Copy ${copyType} Palette`
+                    break;
+                default:
+                    copyStatusTxt = ""
+                    break;
+            }            
+
+            copyLog.innerText = copyStatusTxt;
+
+            if(copyState !== CopyState.EMPTY) {
+                clearTimeout(this.copyTimeoutId);
+                this.copyTimeoutId = setTimeout(()=> this.updateCopyLog(copyLog), 2000);
+            }
         }
 
         disconnectedCallback() {
@@ -63,17 +106,22 @@
         getCopyButtons(id: string): HTMLElement {
 
             const copyButtonsContainer = document.createElement("div");
+            copyButtonsContainer.setAttribute("data-key", id);
+            copyButtonsContainer.classList.add("colorindex-copy-container");            
+
             const copyHex = document.createElement("button");
             copyHex.innerText = "Copy HEX";
-            copyHex.setAttribute("data-type", "hex");
-            copyHex.setAttribute("data-key", id);
+            copyHex.setAttribute("data-type", "hex");           
             copyButtonsContainer.appendChild(copyHex);
 
             const copyRGB = document.createElement("button");
             copyRGB.setAttribute("data-type", "rgb");
-            copyRGB.innerText = "Copy RGB";
-            copyRGB.setAttribute("data-key", id);
+            copyRGB.innerText = "Copy RGB";           
             copyButtonsContainer.appendChild(copyRGB);
+
+            const copyLog = document.createElement("p");
+            copyLog.classList.add("colorindex-copy-log");
+            copyButtonsContainer.appendChild(copyLog);
 
             return copyButtonsContainer;
         }
@@ -109,10 +157,9 @@
                     colorItemTitle.classList.add("colorindex-item-title");
     
                     const colorItemListContainer = document.createElement("div");
-                    colorItemListContainer.classList.add("colorindex-item-list");   
-                    
+                    colorItemListContainer.classList.add("colorindex-item-list");                       
                     colorItemContainer.appendChild(this.getCopyButtons(colorKey));
-    
+
                     colorItemTitle.innerText = colorKey;
                     this.colorItems[colorKey].split(",").forEach((color)=> {
                         const colorDiv = document.createElement("div");                    
