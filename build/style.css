@@ -1,49 +1,49 @@
-.colorindex-app {
-  display: grid;
-  grid-template-columns: 75% 25%;
-  grid-template-rows: 4vw 30vw 10vw;
-  grid-gap: 1em;
-  font-family: Helvetica;
-  padding: 20px 50px;
+.color-index-app {
+    display: grid;
+    grid-template-columns: 75% 25%;
+    grid-template-rows: 4vw 30vw 10vw;
+    grid-gap: 1em;
+    font-family: Helvetica;
+    padding: 20px 50px;
 }
 
-.colorindex-header {
-  grid-column: 1 / span 2;
-  font-size: 4vw;
-  font-weight: 600;
+.color-index-header {
+    grid-column: 1 / span 2;
+    font-size: 4vw;
+    font-weight: 600;
 }
 
-.colorindex-header,
-.colorindex-main,
-.colorindex-aside,
-.colorindex-footer {
-  justify-content: center;
+.color-index-header,
+.color-index-main,
+.color-index-aside,
+.color-index-footer {
+    justify-content: center;
 }
 
-.colorindex-item-container {
-  display: block;
-  margin: 15px 0 0;
+.color-index-item-container {
+    display: block;
+    margin: 15px 0 0;
 }
-.colorindex-item-title {
-  font-size: 1rem;
-  padding: 10px 0 10px;
-}
-
-.colorindex-item-list {
-  display: flex;
-  height: 100px;
-  flex-direction: row;
+.color-index-item-title {
+    font-size: 1rem;
+    padding: 10px 0 10px;
 }
 
-.colorindex-item-list > div {
-  display: inline-block;
-  flex: 1;
+.color-index-item-list {
+    display: flex;
+    height: 100px;
+    flex-direction: row;
+}
+
+.color-index-item-list > div {
+    display: inline-block;
+    flex: 1;
 }
 
 .hidden {
-  display: none;
+    display: none;
 }
-.colorindex-copy-log {
-  margin: 0 5px;
-  display: inline-block;
+.color-index-copy-log {
+    margin: 0 5px;
+    display: inline-block;
 }

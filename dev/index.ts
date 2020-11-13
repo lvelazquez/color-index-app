@@ -3,7 +3,7 @@
  * ColorIndexApp Init
  *
  * Load JSON file with colors
- * Send palettes to colorindex-index-list
+ * Send palettes to color-index-index-list
  *
  **/
 // eslint-disable-next-line no-use-before-define
@@ -31,7 +31,7 @@
     }
 
     customElements.define(
-        'colorindex-item',
+        'color-index-item',
         class ColorIndexItem extends HTMLElement {
             private copyLog: HTMLElement;
             private copyRGBtn: HTMLElement;
@@ -43,19 +43,24 @@
             }
 
             async connectedCallback() {
-                const { id, name, colors } = this.dataset;
-                const colorItemTitle = document.createElement('div');
-                colorItemTitle.classList.add('colorindex-item-title');
-                this.renderCopyButtons();
-
+                const { name, colors } = this.dataset;
+                const colorItemTitle = this.ownerDocument.createElement('div');
+                colorItemTitle.classList.add('color-index-item-title');
                 colorItemTitle.innerText = name;
+
+                const colorListDiv = this.ownerDocument.createElement('div');
+                colorListDiv.classList.add('color-index-item-list');
+
+                // render color list
                 colors.split(',').forEach((color) => {
                     const colorDiv = document.createElement('div');
                     colorDiv.setAttribute('style', `background-color:${color}`);
-                    this.appendChild(colorDiv);
+                    colorListDiv.appendChild(colorDiv);
                 });
 
                 this.appendChild(colorItemTitle);
+                this.renderCopyButtons();
+                this.appendChild(colorListDiv);
             }
 
             disconnectedCallback() {
@@ -107,14 +112,16 @@
                 );
             }
 
-            renderCopyButtons(): HTMLElement {
+            renderCopyButtons() {
                 const copyButtonsContainer = document.createElement('div');
-                copyButtonsContainer.classList.add('colorindex-copy-container');
+                copyButtonsContainer.classList.add(
+                    'color-index-copy-container'
+                );
 
                 this.copyHexBtn = document.createElement('button');
                 this.copyHexBtn.innerText = 'Copy HEX';
                 this.copyHexBtn.setAttribute('data-type', 'hex');
-                this.appendChild(this.copyHexBtn);
+                copyButtonsContainer.appendChild(this.copyHexBtn);
 
                 this.copyRGBtn = document.createElement('button');
                 this.copyRGBtn.setAttribute('data-type', 'rgb');
@@ -122,10 +129,10 @@
                 copyButtonsContainer.appendChild(this.copyRGBtn);
 
                 this.copyLog = document.createElement('p');
-                this.copyLog.classList.add('colorindex-copy-log');
+                this.copyLog.classList.add('color-index-copy-log');
                 copyButtonsContainer.appendChild(this.copyLog);
 
-                return copyButtonsContainer;
+                this.appendChild(copyButtonsContainer);
             }
 
             convertToRGB(hex: string): boolean | number[] {
@@ -177,7 +184,7 @@
     );
 
     customElements.define(
-        'colorindex-list',
+        'color-index-list',
         class ColorIndexList extends HTMLElement {
             private colorItems: ColorDataItems = {};
             private colorIds: string[] = [];
@@ -191,17 +198,17 @@
                     this.colorItems = await colorRes.json();
                     this.colorIds = Object.keys(this.colorItems);
                     this.ownerDocument
-                        .getElementById('colorindex-loader')
+                        .getElementById('color-index-loader')
                         .classList.add('hidden');
                     for (let colorId of this.colorIds) {
                         const { colors, name } = this.colorItems[colorId];
                         const colorItem = document.createElement(
-                            'colorindex-item'
+                            'color-index-item'
                         );
                         colorItem.setAttribute('data-id', colorId);
                         colorItem.setAttribute('data-colors', colors);
                         colorItem.setAttribute('data-name', name);
-                        colorItem.classList.add('colorindex-item-container');
+                        colorItem.classList.add('color-index-item-container');
 
                         this.appendChild(colorItem);
                     }
@@ -211,7 +218,7 @@
     );
 
     customElements.define(
-        'colorindex-palette-input',
+        'color-index-palette-input',
         class PaletteInput extends HTMLElement {
             private submitBtn: HTMLElement;
             private input: HTMLElement;
@@ -234,11 +241,11 @@
                 this.addFormContainer = this.ownerDocument.createElement('div');
 
                 this.input = this.ownerDocument.createElement('input');
-                this.input.classList.add('colorindex-addpalette-input');
+                this.input.classList.add('color-index-addpalette-input');
                 this.input.addEventListener('blur', this.togglePaletteInput);
 
                 this.submitBtn = this.ownerDocument.createElement('button');
-                this.submitBtn.classList.add('colorindex-submit-btn');
+                this.submitBtn.classList.add('color-index-submit-btn');
 
                 this.submitBtn.addEventListener('click', this.savePalette);
                 this.submitBtn.innerText = 'Save Palette';
