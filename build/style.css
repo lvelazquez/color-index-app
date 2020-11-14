@@ -28,16 +28,23 @@
     font-size: 1rem;
     padding: 10px 0 10px;
 }
-
+.color-index-copy-container {
+    margin-bottom: 10px;
+}
 .color-index-item-list {
     display: flex;
     height: 100px;
     flex-direction: row;
 }
 
-.color-index-item-list > div {
+.color-index-item-list > .colorindex-item {
     display: inline-block;
     flex: 1;
+}
+
+.colorindex-item > div {
+    width: 100%;
+    height: 100%;
 }
 
 .hidden {

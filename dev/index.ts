@@ -33,39 +33,88 @@
     customElements.define(
         'color-index-item',
         class ColorIndexItem extends HTMLElement {
+            private colorDataList: string[] = [];
             private copyLog: HTMLElement;
             private copyRGBtn: HTMLElement;
             private copyHexBtn: HTMLElement;
+            private colorListDiv: HTMLElement;
             private copyTimeoutId: number = 0;
+            private dragIndex: number = 0;
 
             constructor() {
                 super();
             }
 
             async connectedCallback() {
-                const { name, colors } = this.dataset;
+                const { id = 'id', name, colors } = this.dataset;
+                this.id = id;
+                this.setAttribute('id', this.id);
                 const colorItemTitle = this.ownerDocument.createElement('div');
+
                 colorItemTitle.classList.add('color-index-item-title');
                 colorItemTitle.innerText = name;
+                this.colorDataList = colors
+                    .split(',')
+                    .map((color) => color.trim());
 
-                const colorListDiv = this.ownerDocument.createElement('div');
-                colorListDiv.classList.add('color-index-item-list');
-
-                // render color list
-                colors.split(',').forEach((color) => {
-                    const colorDiv = document.createElement('div');
-                    colorDiv.setAttribute('style', `background-color:${color}`);
-                    colorListDiv.appendChild(colorDiv);
-                });
-
+                this.colorListDiv = this.ownerDocument.createElement('div');
+                this.colorListDiv.classList.add('color-index-item-list');
+                this.colorListDiv.addEventListener(
+                    'dragstart',
+                    this.handleDrag
+                );
+                this.colorListDiv.addEventListener(
+                    'dragenter',
+                    this.handleDrag
+                );
+                this.colorListDiv.addEventListener(
+                    'dragleave',
+                    this.handleDrag
+                );
+                this.colorListDiv.addEventListener('drag', this.handleDrag);
+                this.renderColorList();
                 this.appendChild(colorItemTitle);
                 this.renderCopyButtons();
-                this.appendChild(colorListDiv);
+                this.appendChild(this.colorListDiv);
             }
 
             disconnectedCallback() {
                 this.removeEventListener('click', this.copyColors);
             }
+
+            handleDrag = (e: MouseEvent) => {
+                switch (e.type) {
+                    case 'dragstart':
+                        this.dragIndex = parseInt(
+                            (e.target as HTMLElement).dataset.index
+                        );
+                        break;
+                    case 'dragstop':
+                        break;
+                    case 'dragenter':
+                        const targetIndex = parseInt(
+                            (e.target as HTMLElement).dataset.index
+                        );
+                        if (targetIndex !== this.dragIndex) {
+                            const activeValue = this.colorDataList[
+                                this.dragIndex
+                            ];
+                            const movedValue = this.colorDataList[targetIndex];
+                            this.colorDataList[this.dragIndex] = movedValue;
+                            this.colorDataList[targetIndex] = activeValue;
+                            this.dragIndex = targetIndex;
+                            this.renderColorList();
+                        }
+                        break;
+                    case 'dragleave':
+                        break;
+                    case 'drag':
+                        break;
+                    case 'drop':
+                        e.preventDefault();
+                        break;
+                }
+            };
 
             handleCopyClick = (e: MouseEvent) => {
                 const type = (e.currentTarget as HTMLButtonElement).dataset
@@ -110,6 +159,27 @@
                         this.updateCopyLog(type, CopyState.ERROR);
                     }
                 );
+            }
+
+            renderColorList() {
+                this.colorListDiv.innerHTML = '';
+                // TODO use pre rendered template
+                this.colorDataList.forEach((color, i) => {
+                    const colorWrapper = document.createElement('div');
+                    colorWrapper.addEventListener('drop', this.handleDrag);
+                    const colorPiece = document.createElement('div');
+                    colorWrapper.classList.add('dropzone');
+                    colorWrapper.classList.add('colorindex-item');
+                    colorPiece.setAttribute('draggable', 'true');
+                    colorPiece.setAttribute('data-index', `${i}`);
+                    colorPiece.setAttribute('data-color', color);
+                    colorPiece.setAttribute(
+                        'style',
+                        `background-color:${color}`
+                    );
+                    colorWrapper.appendChild(colorPiece);
+                    this.colorListDiv.appendChild(colorWrapper);
+                });
             }
 
             renderCopyButtons() {
