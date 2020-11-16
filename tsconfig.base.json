@@ -1,6 +1,6 @@
 {
   "compileOnSave": true,
-"compilerOptions": {
+  "compilerOptions": {  
     
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
 
@@ -14,10 +14,11 @@
     // "jsx": "preserve",                     /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */
     // "declaration": true,                   /* Generates corresponding '.d.ts' file. */
     // "declarationMap": true,                /* Generates a sourcemap for each corresponding '.d.ts' file. */
-    // "sourceMap": true,                     /* Generates corresponding '.map' file. */
-    "outFile": "./build/index.js",                       /* Concatenate and emit output to single file. */
+    // "sourceMap": true,                     /* Generates corresponding '.map' file. */    
+    "outFile": "./build/index.js",                       /* Concatenate and emit output to single file. */ 
     // "outDir": "./build/",                    /* Redirect output structure to the directory. */
-    "rootDir": "./dev/",                      /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
+     // "outFile": "./build/index.js",                    /* Redirect output structure to the directory. */
+     "rootDir": "./src/client/",                      /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
     // "composite": true,                     /* Enable project compilation */
     // "tsBuildInfoFile": "./",               /* Specify file to store incremental compilation information */
     // "removeComments": true,                /* Do not emit comments to output. */
@@ -67,9 +68,14 @@
     /* Advanced Options */
     "skipLibCheck": true,                     /* Skip type checking of declaration files. */
     "forceConsistentCasingInFileNames": true, /* Disallow inconsistently-cased references to the same file. */
-    "typeRoots": [ "./types/", "./node_modules/@types"],    
-    "types": ["ClipboardItem"]  
+    "typeRoots": [ "./types/", "./node_modules/@types"],     
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "removeComments": false,
+    "noImplicitAny": false
   },
-  "include": ["./dev"],
-  "exclude": ["./build", "./node_modules/*", "./server", "./types/"],
+  "include": ["src/client/"],
+  "exclude": ["./build", "./node_modules/*", "./types/"],
 }

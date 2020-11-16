@@ -1,3 +1,5 @@
 node_modules/
 build/index.js
+build/index.js.map
+server/index.js
 .env

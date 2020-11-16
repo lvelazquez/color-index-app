@@ -33,13 +33,17 @@
     customElements.define(
         'color-index-item',
         class ColorIndexItem extends HTMLElement {
+            /* @param colorDataList: Stores a original data */
             private colorDataList: string[] = [];
-            private copyLog: HTMLElement;
-            private copyRGBtn: HTMLElement;
-            private copyHexBtn: HTMLElement;
-            private colorListDiv: HTMLElement;
-            private copyTimeoutId: number = 0;
-            private dragIndex: number = 0;
+            /* @param colorUIList: Stores display data */
+            private colorUIList: string[] = [];
+            /* @param colorUIList: Stores display data */
+            private copyLog: HTMLParagraphElement;
+            private copyRGBtn: HTMLButtonElement;
+            private copyHexBtn: HTMLButtonElement;
+            private colorListDiv: HTMLDivElement;
+            private copyTimeoutId: ReturnType<typeof setTimeout>;
+            private activeIndex: number = 0;
 
             constructor() {
                 super();
@@ -50,13 +54,12 @@
                 this.id = id;
                 this.setAttribute('id', this.id);
                 const colorItemTitle = this.ownerDocument.createElement('div');
-
                 colorItemTitle.classList.add('color-index-item-title');
                 colorItemTitle.innerText = name;
                 this.colorDataList = colors
                     .split(',')
                     .map((color) => color.trim());
-
+                this.colorUIList = [...this.colorDataList];
                 this.colorListDiv = this.ownerDocument.createElement('div');
                 this.colorListDiv.classList.add('color-index-item-list');
                 this.colorListDiv.addEventListener(
@@ -71,7 +74,8 @@
                     'dragleave',
                     this.handleDrag
                 );
-                this.colorListDiv.addEventListener('drag', this.handleDrag);
+                // TODO make work
+                this.colorListDiv.addEventListener('drop', this.handleDrag);
                 this.renderColorList();
                 this.appendChild(colorItemTitle);
                 this.renderCopyButtons();
@@ -82,10 +86,24 @@
                 this.removeEventListener('click', this.copyColors);
             }
 
+            isListUpdated(): boolean {
+                let updated: boolean = false;
+                for (let colorIndex in this.colorUIList) {
+                    updated =
+                        this.colorDataList[colorIndex] !==
+                        this.colorDataList[colorIndex];
+                    if (updated) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
             handleDrag = (e: MouseEvent) => {
                 switch (e.type) {
                     case 'dragstart':
-                        this.dragIndex = parseInt(
+                        console.log('dragstart');
+                        this.activeIndex = parseInt(
                             (e.target as HTMLElement).dataset.index
                         );
                         break;
@@ -95,15 +113,16 @@
                         const targetIndex = parseInt(
                             (e.target as HTMLElement).dataset.index
                         );
-                        if (targetIndex !== this.dragIndex) {
+                        if (targetIndex !== this.activeIndex) {
                             const activeValue = this.colorDataList[
-                                this.dragIndex
+                                this.activeIndex
                             ];
                             const movedValue = this.colorDataList[targetIndex];
-                            this.colorDataList[this.dragIndex] = movedValue;
+                            this.colorDataList[this.activeIndex] = movedValue;
                             this.colorDataList[targetIndex] = activeValue;
-                            this.dragIndex = targetIndex;
+                            this.activeIndex = targetIndex;
                             this.renderColorList();
+                            console.log('isListUpdated', this.isListUpdated());
                         }
                         break;
                     case 'dragleave':
@@ -112,6 +131,7 @@
                         break;
                     case 'drop':
                         e.preventDefault();
+                        console.log('drop');
                         break;
                 }
             };
@@ -123,9 +143,10 @@
             };
 
             async copyColors(type) {
+                this.updateCopyLog(type, CopyState.PROGRESS);
+
                 let copyColorList: string = '';
                 const { colors, id } = this.dataset;
-                this.updateCopyLog(type, CopyState.PROGRESS);
                 switch (type) {
                     case 'hex':
                         const hexList: string = `[${colors[id]}]`.replace(
@@ -164,9 +185,8 @@
             renderColorList() {
                 this.colorListDiv.innerHTML = '';
                 // TODO use pre rendered template
-                this.colorDataList.forEach((color, i) => {
+                this.colorUIList.forEach((color, i) => {
                     const colorWrapper = document.createElement('div');
-                    colorWrapper.addEventListener('drop', this.handleDrag);
                     const colorPiece = document.createElement('div');
                     colorWrapper.classList.add('dropzone');
                     colorWrapper.classList.add('colorindex-item');
@@ -215,7 +235,6 @@
                     ];
                     return aRgb;
                 }
-
                 return false;
             }
 
@@ -290,10 +309,10 @@
     customElements.define(
         'color-index-palette-input',
         class PaletteInput extends HTMLElement {
-            private submitBtn: HTMLElement;
-            private input: HTMLElement;
-            private revealBtn: HTMLElement;
-            private addFormContainer: HTMLElement;
+            private submitBtn: HTMLButtonElement;
+            private toggleShowBtn: HTMLButtonElement;
+            private input: HTMLInputElement;
+            private inputContainer: HTMLDivElement;
             private isFormHidden = true;
 
             constructor() {
@@ -301,14 +320,14 @@
             }
 
             connectedCallback() {
-                this.revealBtn = this.ownerDocument.createElement('button');
-                this.revealBtn.innerText = 'Add New Palette +';
-                this.revealBtn.addEventListener(
+                this.toggleShowBtn = this.ownerDocument.createElement('button');
+                this.toggleShowBtn.innerText = 'Add New Palette +';
+                this.toggleShowBtn.addEventListener(
                     'click',
                     this.togglePaletteInput
                 );
 
-                this.addFormContainer = this.ownerDocument.createElement('div');
+                this.inputContainer = this.ownerDocument.createElement('div');
 
                 this.input = this.ownerDocument.createElement('input');
                 this.input.classList.add('color-index-addpalette-input');
@@ -320,13 +339,13 @@
                 this.submitBtn.addEventListener('click', this.savePalette);
                 this.submitBtn.innerText = 'Save Palette';
 
-                this.addFormContainer.appendChild(this.input);
-                this.addFormContainer.appendChild(this.submitBtn);
+                this.inputContainer.appendChild(this.input);
+                this.inputContainer.appendChild(this.submitBtn);
 
-                this.appendChild(this.addFormContainer);
-                this.appendChild(this.revealBtn);
+                this.appendChild(this.inputContainer);
+                this.appendChild(this.toggleShowBtn);
 
-                this.updateUI();
+                this.updatePaletteInput();
             }
 
             disconnectedCallback() {
@@ -336,16 +355,16 @@
 
             togglePaletteInput = () => {
                 this.isFormHidden = !this.isFormHidden;
-                this.updateUI();
+                this.updatePaletteInput();
             };
 
-            updateUI() {
+            updatePaletteInput() {
                 if (this.isFormHidden) {
-                    this.revealBtn.classList.remove('hidden');
-                    this.addFormContainer.classList.add('hidden');
+                    this.toggleShowBtn.classList.remove('hidden');
+                    this.inputContainer.classList.add('hidden');
                 } else {
-                    this.revealBtn.classList.add('hidden');
-                    this.addFormContainer.classList.remove('hidden');
+                    this.toggleShowBtn.classList.add('hidden');
+                    this.inputContainer.classList.remove('hidden');
                     this.input.focus();
                 }
             }
@@ -363,6 +382,9 @@
                     method: 'POST',
                     body: JSON.stringify(colorData),
                 });
+                if (colorRes.ok) {
+                    console.log('Color Palette saved');
+                }
             }
         }
     );

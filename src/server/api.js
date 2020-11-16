@@ -1,9 +1,9 @@
 const process = require('process');
 const Airtable = require('airtable');
 
-const base = new Airtable({ apiKey: process.env.AIRTABLESECRETKEY || '' }).base(
-    process.env.AIRTABLEBASEKEY
-);
+const base = new Airtable({
+    apiKey: process.env['AIRTABLESECRETKEY'] || '',
+}).base(process.env['AIRTABLEBASEKEY']);
 
 module.exports = {
     async getColors() {

@@ -22,8 +22,6 @@ app.get('/getColorData', async function (req, res) {
 });
 
 app.post('/setColorData', async function (req, res) {
-    // console.log("setColorData", res, req);
-    // es.send('POST request to postColors');
     let data = '';
     req.on('data', function (chunk) {
         data += chunk;
@@ -38,7 +36,7 @@ app.post('/setColorData', async function (req, res) {
     // console.log(body);
 });
 
-const server = app.listen(process.env.PORT, function () {
+const server = app.listen(process.env['PORT'], function () {
     const { address, port } = server.address();
     console.log('Running a API server at http://%s:%s', address, port);
 });
