@@ -1,4 +1,3 @@
-const process = require('process');
 const Airtable = require('airtable');
 
 const base = new Airtable({

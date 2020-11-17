@@ -64,18 +64,12 @@
                 this.colorListDiv.classList.add('color-index-item-list');
                 this.colorListDiv.addEventListener(
                     'dragstart',
-                    this.handleDrag
+                    this.handleDragStart
                 );
                 this.colorListDiv.addEventListener(
                     'dragenter',
-                    this.handleDrag
+                    this.handleDragEnter
                 );
-                this.colorListDiv.addEventListener(
-                    'dragleave',
-                    this.handleDrag
-                );
-                // TODO make work
-                this.colorListDiv.addEventListener('drop', this.handleDrag);
                 this.renderColorList();
                 this.appendChild(colorItemTitle);
                 this.renderCopyButtons();
@@ -99,40 +93,24 @@
                 return false;
             }
 
-            handleDrag = (e: MouseEvent) => {
-                switch (e.type) {
-                    case 'dragstart':
-                        console.log('dragstart');
-                        this.activeIndex = parseInt(
-                            (e.target as HTMLElement).dataset.index
-                        );
-                        break;
-                    case 'dragstop':
-                        break;
-                    case 'dragenter':
-                        const targetIndex = parseInt(
-                            (e.target as HTMLElement).dataset.index
-                        );
-                        if (targetIndex !== this.activeIndex) {
-                            const activeValue = this.colorDataList[
-                                this.activeIndex
-                            ];
-                            const movedValue = this.colorDataList[targetIndex];
-                            this.colorDataList[this.activeIndex] = movedValue;
-                            this.colorDataList[targetIndex] = activeValue;
-                            this.activeIndex = targetIndex;
-                            this.renderColorList();
-                            console.log('isListUpdated', this.isListUpdated());
-                        }
-                        break;
-                    case 'dragleave':
-                        break;
-                    case 'drag':
-                        break;
-                    case 'drop':
-                        e.preventDefault();
-                        console.log('drop');
-                        break;
+            handleDragStart = (e: MouseEvent) => {
+                this.activeIndex = parseInt(
+                    (e.target as HTMLElement).dataset.index
+                );
+            };
+
+            handleDragEnter = (e: MouseEvent) => {
+                const targetIndex = parseInt(
+                    (e.target as HTMLElement).dataset.index
+                );
+                if (targetIndex !== this.activeIndex) {
+                    const activeValue = this.colorUIList[this.activeIndex];
+                    const movedValue = this.colorUIList[targetIndex];
+                    this.colorUIList[this.activeIndex] = movedValue;
+                    this.colorUIList[targetIndex] = activeValue;
+                    this.activeIndex = targetIndex;
+                    this.renderColorList();
+                    console.log('isListUpdated', this.isListUpdated());
                 }
             };
 
