@@ -41,6 +41,7 @@
             private copyLog: HTMLParagraphElement;
             private copyRGBtn: HTMLButtonElement;
             private copyHexBtn: HTMLButtonElement;
+            private saveBtn: HTMLButtonElement;
             private colorListDiv: HTMLDivElement;
             private copyTimeoutId: ReturnType<typeof setTimeout>;
             private activeIndex: number = 0;
@@ -70,27 +71,61 @@
                     'dragenter',
                     this.handleDragEnter
                 );
+                this.colorListDiv.addEventListener(
+                    'dragover',
+                    this.handleDragOver
+                );
+                this.colorListDiv.addEventListener('drop', this.handleDrop);
+
                 this.renderColorList();
+
+                this.saveBtn = this.ownerDocument.createElement('button');
+                this.saveBtn.classList.add('color-index-save-btn');
+                this.saveBtn.innerText = 'Update Colors';
+                this.saveBtn.classList.add('hidden');
+                this.saveBtn.addEventListener(
+                    'click',
+                    this.handleUpdatePalette
+                );
+
                 this.appendChild(colorItemTitle);
                 this.renderCopyButtons();
+                this.appendChild(this.saveBtn);
                 this.appendChild(this.colorListDiv);
             }
 
             disconnectedCallback() {
                 this.removeEventListener('click', this.copyColors);
+                this.colorListDiv.removeEventListener(
+                    'dragstart',
+                    this.handleDragStart
+                );
+                this.colorListDiv.removeEventListener(
+                    'dragenter',
+                    this.handleDragEnter
+                );
+                this.colorListDiv.removeEventListener(
+                    'dragover',
+                    this.handleDragOver
+                );
+                this.colorListDiv.removeEventListener('drop', this.handleDrop);
+                this.saveBtn.removeEventListener(
+                    'click',
+                    this.handleUpdatePalette
+                );
             }
 
-            isListUpdated(): boolean {
+            isUpdated(): boolean {
                 let updated: boolean = false;
                 for (let colorIndex in this.colorUIList) {
                     updated =
                         this.colorDataList[colorIndex] !==
-                        this.colorDataList[colorIndex];
+                        this.colorUIList[colorIndex];
                     if (updated) {
-                        return true;
+                        break;
                     }
                 }
-                return false;
+                return updated;
             }
 
             handleDragStart = (e: MouseEvent) => {
@@ -99,7 +134,13 @@
                 );
             };
 
+            handleDragOver = (e: MouseEvent) => {
+                e.preventDefault();
+            };
+
             handleDragEnter = (e: MouseEvent) => {
+                e.preventDefault();
+                console.log(e.type, 'handleDragEnter');
                 const targetIndex = parseInt(
                     (e.target as HTMLElement).dataset.index
                 );
@@ -110,9 +151,19 @@
                     this.colorUIList[targetIndex] = activeValue;
                     this.activeIndex = targetIndex;
                     this.renderColorList();
-                    console.log('isListUpdated', this.isListUpdated());
                 }
             };
+
+            handleDrop = (e: MouseEvent) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (this.isUpdated()) {
+                    this.saveBtn.classList.remove('hidden');
+                }
+                console.log('dropped', e.target);
+            };
+
+            handleUpdatePalette = (e: MouseEvent) => {};
 
             handleCopyClick = (e: MouseEvent) => {
                 const type = (e.currentTarget as HTMLButtonElement).dataset
@@ -261,7 +312,9 @@
 
             async connectedCallback() {
                 const colorRes: Response = await fetch('/getColorData');
+
                 if (colorRes.ok) {
+                    // load localStorage
                     this.colorItems = await colorRes.json();
                     this.colorIds = Object.keys(this.colorItems);
                     this.ownerDocument

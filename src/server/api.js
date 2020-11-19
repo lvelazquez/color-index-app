@@ -3,11 +3,12 @@ const Airtable = require('airtable');
 const base = new Airtable({
     apiKey: process.env['AIRTABLESECRETKEY'] || '',
 }).base(process.env['AIRTABLEBASEKEY']);
+const colorsTable = base('Colors');
 
 module.exports = {
     async getColors() {
         return new Promise(async (resolve, reject) => {
-            base('Colors')
+            colorsTable
                 .select({
                     view: 'Grid view',
                 })
@@ -54,7 +55,7 @@ module.exports = {
             colorInfo.hasOwnProperty('name')
         ) {
             return new Promise((resolve, reject) => {
-                base('Colors').create(
+                colorsTable.create(
                     {
                         Colors: colorInfo.colors,
                         Name: colorInfo.name,
@@ -69,16 +70,16 @@ module.exports = {
             });
         }
     },
-    async updateColors(colorInfo) {
+    async updateColors(recordId, colorInfo) {
         // TODO improve validation
         // TODO error handling
         if (
-            colorInfo.hasOwnProperty('recordId') &&
+            recordId &&
             colorInfo.hasOwnProperty('colors') &&
             colorInfo.hasOwnProperty('name')
         ) {
             return new Promise((resolve, reject) => {
-                base('Colors').update(
+                colorsTable.update(
                     colorInfo.recordId,
                     {
                         Colors: colorInfo.colors,
@@ -98,7 +99,7 @@ module.exports = {
         // TODO improve validation
         // TODO error handling
         if (
-            colorInfo.hasOwnProperty('recordId') &&
+            recordId &&
             colorInfo.hasOwnProperty('colors') &&
             colorInfo.hasOwnProperty('name')
         ) {

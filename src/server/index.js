@@ -36,6 +36,17 @@ app.post('/setColorData', async function (req, res) {
     // console.log(body);
 });
 
+app.post('/updateColorData', async function (req, res) {
+    api.updateColors()
+        .then((colors) => {
+            // api.getColors().then(colors=> {
+            res.json(colors);
+        })
+        .catch((err) => {
+            res.json(err);
+        });
+});
+
 const server = app.listen(process.env['PORT'], function () {
     const { address, port } = server.address();
     console.log('Running a API server at http://%s:%s', address, port);

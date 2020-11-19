@@ -28,9 +28,12 @@
     font-size: 1rem;
     padding: 10px 0 10px;
 }
-.color-index-copy-container {
+.color-index-copy-container,
+.color-index-save-btn {
     margin-bottom: 10px;
+    display: inline-block;
 }
+
 .color-index-item-list {
     display: flex;
     height: 100px;

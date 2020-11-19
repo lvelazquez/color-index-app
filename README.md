@@ -1,4 +1,4 @@
 # Color Index
 
-Simple App for viewing color palettes locally, storing them on Airtable and copying favorite color palettes to clipboard as arrays of either hex or RGB values.
+Simple CRUD App for collecting color palettes locally, storing them on an Airtable database.
 Intended for creative coding applications.
