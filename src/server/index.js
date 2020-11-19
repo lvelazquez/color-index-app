@@ -37,14 +37,28 @@ app.post('/setColorData', async function (req, res) {
 });
 
 app.post('/updateColorData', async function (req, res) {
-    api.updateColors()
-        .then((colors) => {
-            // api.getColors().then(colors=> {
-            res.json(colors);
-        })
-        .catch((err) => {
-            res.json(err);
-        });
+    let data = '';
+    req.on('data', function (chunk) {
+        data += chunk;
+    });
+    req.on('end', async function () {
+        req.rawBody = data;
+        req.jsonBody = JSON.parse(data);
+        const { recordId, colorInfo } = req.jsonBody;
+        console.log(
+            'recordId',
+            recordId,
+            'colorInfo',
+            colorInfo.name,
+            colorInfo.colors
+        );
+        if (recordId && colorInfo) {
+            const success = await api.updateColors(recordId, colorInfo);
+            console.log('success', success);
+        }
+
+        // next();
+    });
 });
 
 const server = app.listen(process.env['PORT'], function () {

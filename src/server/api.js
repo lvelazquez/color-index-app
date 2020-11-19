@@ -80,7 +80,7 @@ module.exports = {
         ) {
             return new Promise((resolve, reject) => {
                 colorsTable.update(
-                    colorInfo.recordId,
+                    recordId,
                     {
                         Colors: colorInfo.colors,
                         Name: colorInfo.name,

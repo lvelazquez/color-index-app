@@ -30,6 +30,39 @@
         ERROR = 'COPY_ERROR',
     }
 
+    const ColorsApi = {
+        updateColors: async (recordId: string, colorInfo: ColorDataItem) => {
+            const colorRes: Response = await fetch('/updateColorData', {
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
+                method: 'POST',
+                body: JSON.stringify({
+                    recordId,
+                    colorInfo,
+                }),
+            });
+            if (colorRes.ok) {
+                console.log('Color Palette saved');
+            }
+        },
+        createColors: async (colorInfo: ColorDataItem) => {
+            const colorRes: Response = await fetch('/setColorData', {
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
+                method: 'POST',
+                body: JSON.stringify(colorInfo),
+            });
+            if (colorRes.ok) {
+                console.log('Color Palette saved');
+            }
+        },
+        getColors: async () => {
+            return await fetch('/getColorData');
+        },
+    };
+
     customElements.define(
         'color-index-item',
         class ColorIndexItem extends HTMLElement {
@@ -45,6 +78,7 @@
             private colorListDiv: HTMLDivElement;
             private copyTimeoutId: ReturnType<typeof setTimeout>;
             private activeIndex: number = 0;
+            private name: string;
 
             constructor() {
                 super();
@@ -53,6 +87,7 @@
             async connectedCallback() {
                 const { id = 'id', name, colors } = this.dataset;
                 this.id = id;
+                this.name = name;
                 this.setAttribute('id', this.id);
                 const colorItemTitle = this.ownerDocument.createElement('div');
                 colorItemTitle.classList.add('color-index-item-title');
@@ -160,10 +195,15 @@
                 if (this.isUpdated()) {
                     this.saveBtn.classList.remove('hidden');
                 }
-                console.log('dropped', e.target);
             };
 
-            handleUpdatePalette = (e: MouseEvent) => {};
+            handleUpdatePalette = (e: MouseEvent) => {
+                const colorInfo = {
+                    colors: this.colorUIList.join(','),
+                    name: this.name,
+                };
+                ColorsApi.updateColors(this.id, colorInfo);
+            };
 
             handleCopyClick = (e: MouseEvent) => {
                 const type = (e.currentTarget as HTMLButtonElement).dataset
@@ -311,8 +351,7 @@
             }
 
             async connectedCallback() {
-                const colorRes: Response = await fetch('/getColorData');
-
+                const colorRes: Response = await ColorsApi.getColors();
                 if (colorRes.ok) {
                     // load localStorage
                     this.colorItems = await colorRes.json();
@@ -406,16 +445,7 @@
                     colors: '#FFFFF, #FF00F, #00FFF, #FFF00, #00FFF',
                     name: 'My Color Test',
                 };
-                const colorRes: Response = await fetch('/setColorData', {
-                    headers: {
-                        'Content-Type': 'application/json; charset=utf-8',
-                    },
-                    method: 'POST',
-                    body: JSON.stringify(colorData),
-                });
-                if (colorRes.ok) {
-                    console.log('Color Palette saved');
-                }
+                ColorsApi.createColors(colorData);
             }
         }
     );
