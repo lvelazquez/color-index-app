@@ -1,11 +1,3 @@
-/**
- *
- * ColorIndexApp Init
- *
- * Load JSON file with colors
- * Send palettes to color-index-index-list
- *
- **/
 // eslint-disable-next-line no-use-before-define
 (function () {
     'use strict';
