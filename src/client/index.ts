@@ -44,6 +44,8 @@
             });
             if (colorRes.ok) {
                 console.log('Color Palette saved');
+            } else {
+                console.log('Color Palette NOT saved');
             }
         },
         createColors: async (colorInfo: ColorDataItem) => {
@@ -68,9 +70,7 @@
         class ColorIndexItem extends HTMLElement {
             /* @param colorDataList: Stores a original data */
             private colorDataList: string[] = [];
-            /* @param colorUIList: Stores display data */
             private colorUIList: string[] = [];
-            /* @param colorUIList: Stores display data */
             private copyLog: HTMLParagraphElement;
             private copyRGBtn: HTMLButtonElement;
             private copyHexBtn: HTMLButtonElement;
