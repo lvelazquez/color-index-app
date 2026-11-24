@@ -25,9 +25,15 @@ npm run build    # type-check + production build into dist/
 npm run preview  # serve dist/
 ```
 
-## Deploy
+## Deploy and CI
 
-Pushes to `main` build and publish `dist/` to GitHub Pages through `.github/workflows/pages.yml`. In the repo settings, set Pages source to "GitHub Actions". The build uses a relative base, so it works from any sub-path.
+Ready-made GitHub Actions workflows live in `docs/workflows/` (`ci.yml`: lint, test, build; `pages.yml`: build and publish `dist/` to GitHub Pages). They could not be pushed to `.github/workflows/` by the automation that prepared this branch, so move them there yourself:
+
+```sh
+mkdir -p .github/workflows && git mv docs/workflows/*.yml .github/workflows/
+```
+
+Then set Pages source to "GitHub Actions" in the repo settings. The build uses a relative base, so it works from any sub-path.
 
 ## Data format
 
