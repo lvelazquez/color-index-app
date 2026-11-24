@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="Store color palettes and copy them to the clipboard for creative coding."
+        />
+        <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+        <title>Color Index</title>
+    </head>
+    <body>
+        <a class="skip-link" href="#main">Skip to palettes</a>
+        <div class="app">
+            <header class="app-header">
+                <h1>Color Index</h1>
+                <div class="app-tools">
+                    <button type="button" id="export-btn">Export JSON</button>
+                    <button type="button" id="import-btn">Import JSON</button>
+                    <input
+                        type="file"
+                        id="import-file"
+                        accept="application/json,.json"
+                        hidden
+                    />
+                </div>
+            </header>
+            <main id="main" class="app-main" tabindex="-1">
+                <form id="add-form" class="add-form" novalidate>
+                    <h2>Add palette</h2>
+                    <div class="field">
+                        <label for="add-name">Name</label>
+                        <input id="add-name" name="name" autocomplete="off" />
+                    </div>
+                    <div class="field">
+                        <label for="add-colors">Colors</label>
+                        <input
+                            id="add-colors"
+                            name="colors"
+                            autocomplete="off"
+                            placeholder="#264653, #2a9d8f, #e9c46a"
+                            aria-describedby="add-hint add-error"
+                        />
+                        <p id="add-hint" class="hint">
+                            Hex colors separated by commas or spaces. Use 3 or 6
+                            digits, with or without the #.
+                        </p>
+                        <p id="add-error" class="error" role="alert"></p>
+                    </div>
+                    <button type="submit" class="primary">Save palette</button>
+                </form>
+                <p class="hint">
+                    Click a swatch to copy that color. Focus a swatch and press
+                    Alt+Left or Alt+Right to reorder it, or drag it.
+                </p>
+                <section aria-labelledby="list-title">
+                    <h2 id="list-title">Palettes</h2>
+                    <p id="empty" class="hint" hidden>
+                        No palettes yet. Add one above or import a JSON file.
+                    </p>
+                    <ul id="palette-list" class="palette-list"></ul>
+                </section>
+            </main>
+            <p
+                id="status"
+                class="visually-hidden"
+                role="status"
+                aria-live="polite"
+            ></p>
+            <p id="toast" class="toast" aria-hidden="true"></p>
+        </div>
+        <script type="module" src="/src/main.ts"></script>
+    </body>
+</html>
